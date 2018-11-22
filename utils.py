@@ -30,6 +30,7 @@ def read_csv(file_name):
     reader = csv.DictReader(data)
     for r in reader:
         csv_rows.append(r)
+    fp.close()
     return csv_rows
 
 def list_csv_files(path):
@@ -53,4 +54,23 @@ def read_csv_files(file_names):
         i += 1
     return all_rows
 
+def write_csv(file_name, rows):
+    fields = rows[0].keys()
+    fp = open(os.path.expanduser(file_name),"w")
+    writer = csv.DictWriter(fp, fieldnames=fields)
+    writer.writeheader()
+    i = 0
+    n = len(rows)
+    bad_rows = []
+    for i in xrange(0,n):
+        try:
+            writer.writerow(rows[i])
+        except:
+            printf("Bad row %i\n", i)
+            bad_rows.append(rows[i])
+        if i % 10000 == 0:
+            printf("%0.2f%% percent complete\n", 100.0*float(i)/float(n))
+        i += 1
+    fp.close()
+    return bad_rows
 
