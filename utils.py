@@ -51,6 +51,7 @@ def read_csv(file_name, display_interval=None):
     fp.close()
     return csv_rows
 
+
 def list_csv_files(path):
     file_names = []
     for file_name in os.listdir(os.path.expanduser(path)):
@@ -58,6 +59,7 @@ def list_csv_files(path):
         if ext.lower() == ".csv":
             file_names.append(os.path.join(path, file_name))
     return file_names
+
 
 def read_csv_files(file_names, display_interval=None):
     n = len(file_names)
@@ -72,10 +74,12 @@ def read_csv_files(file_names, display_interval=None):
         i += 1
     return all_rows
 
+
 def excuse():
     except_message = traceback.format_exc()
     stack_message  = traceback.format_stack()
     return except_message + " " + str(stack_message)
+
 
 def write_csv(file_name, rows):
     fields = rows[0].keys()
@@ -97,9 +101,11 @@ def write_csv(file_name, rows):
     fp.close()
     return bad_rows
 
+
 def display_row(row):
     for key in sorted(row.keys()):
         printf("%s: %s\n", key, row[key])
+
 
 def test_re(val, exp):
     p = re.compile(exp)
@@ -107,6 +113,7 @@ def test_re(val, exp):
     if m:
         return m.groups()
     return False
+
 
 def getcollens(rows):
     lens = {}
@@ -176,17 +183,17 @@ def pop_rows(rows, n):
 
 
 def dtstr2date(dtstr):
-    m = dtstr_re(dtstr)
+    m = dtstr_re.match(dtstr)
     if m:
-        month = int(m.group(0))
-        day = int(m.group(1))
-        year = int(m.group(2))
-        return datetime.date(year, month, day)
-    m = dtint_re(dtstr)
-    if m:
-        year = int(m.group(0))
         month = int(m.group(1))
         day = int(m.group(2))
+        year = int(m.group(3))
+        return datetime.date(year, month, day)
+    m = dtint_re.match(dtstr)
+    if m:
+        year = int(m.group(1))
+        month = int(m.group(2))
+        day = int(m.group(3))
         return datetime.date(year, month, day)
     return None
 
