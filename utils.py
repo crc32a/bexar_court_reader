@@ -147,6 +147,7 @@ def get_date(row, k):
     except:
         return None
 
+
 def make_cols(rows, lens, keys):
     out = []
     for k in sorted(keys):
@@ -162,6 +163,16 @@ def get_float(row, k):
         return float(row[k])
     except:
         return None
+
+
+def pop_rows(rows, n):
+    l = len(rows)
+    out = []
+    if l < n:
+        n = l
+    for i in xrange(0, n):
+        out.append(rows.pop())
+    return out
 
 
 def dtstr2date(dtstr):
