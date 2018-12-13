@@ -41,7 +41,7 @@ def read_csv(file_name, display_interval=None):
     i = 0
     csv_rows = []
     fp = open(os.path.expanduser(file_name), "r")
-    data = fp.read().replace("\x00","").splitlines()
+    data = fp.read().replace("\x00", "").splitlines()
     reader = csv.DictReader(data)
     for r in reader:
         if display_interval and i % display_interval == 0:
