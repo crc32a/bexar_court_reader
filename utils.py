@@ -2,30 +2,52 @@
 
 
 import traceback
-import cPickle
+import tempfile
+import requests
 import datetime
+import cPickle
+import StringIO
+import pycurl
+import time
 import json
 import sys
 import csv
 import os
 import re
 
+felony_url = "http://home.bexar.org/dc/dcrecords.html"
+misdemeaner_url = "http://gov.bexar.org/cc/records.html"
+
 dtstr_re = re.compile("([0-9]+)/([0-9]+)/([0-9]+)")
 
 dtint_re = re.compile("([0-9]{4})([0-9]{2})([0-9]{2})")
 
-
+http_re = re.compile(r"(http://.*\.csv+)")
 
 def printf(format,*args): sys.stdout.write(format%args)
 
-
 def fprintf(fp,format,*args): fp.write(format%args)
 
+def read_url_rows(url):
+    fp = tempfile.TemporaryFile('w')
+    r = requests.get(url)
+    data = r.text.replace("\x00","").splitlines()
+    fp.write(data)
 
-def read_csv(file_name):
-    file_path = os.path.expandusr
+def clean_ascii(text):
+    return "".join([ch if ord(ch) < 127 else '' for ch in text])
 
-
+def curl_url(url):
+    buffer = StringIO.StringIO()
+    c = pycurl.Curl()
+    c.setopt(c.URL, url)
+    c.setopt(c.WRITEDATA, buffer)
+    c.setopt(c.CONNECTTIMEOUT, 15)
+    c.perform()
+    c.close()
+    body = buffer.getvalue()    
+    return clean_ascii(body)
+        
 def load_json(pathIn):
     return json.loads(open(os.path.expanduser(pathIn), "r").read())
 
@@ -42,13 +64,13 @@ def read_csv(file_name, display_interval=None):
     csv_rows = []
     fp = open(os.path.expanduser(file_name), "r")
     data = fp.read().replace("\x00", "").splitlines()
+    fp.close()
     reader = csv.DictReader(data)
     for r in reader:
         if display_interval and i % display_interval == 0:
             printf("%i rows read\n", i)
         csv_rows.append(r)
         i += 1
-    fp.close()
     return csv_rows
 
 
@@ -60,7 +82,6 @@ def list_csv_files(path):
             file_names.append(os.path.join(path, file_name))
     return file_names
 
-
 def read_csv_files(file_names, display_interval=None):
     n = len(file_names)
     i = 0
@@ -69,6 +90,48 @@ def read_csv_files(file_names, display_interval=None):
         printf("reading %i of %i file name %s: ", i, n, file_name)
         sys.stdout.flush()
         rows = read_csv(file_name, display_interval=display_interval)
+        all_rows.extend(rows)
+        printf(" %i rows read\n", len(rows))
+        i += 1
+    return all_rows
+
+def get_csv_urls():
+    csv_urls = []
+    r = requests.get(felony_url)
+    for csv_url in http_re.findall(r.text):
+        csv_urls.append(csv_url)
+    r = requests.get(misdemeaner_url)
+    for csv_url in http_re.findall(r.text):
+        csv_urls.append(csv_url)
+    return csv_urls
+
+def read_csv_url(file_url, display_interval=None):
+    i = 0
+    csv_rows = []
+    while True:
+        try:
+            text = curl_url(file_url)
+            data = text.replace("\x00","").splitlines()
+            reader = csv.DictReader(data)
+            break
+        except:
+            printf("%s: retrying %s\n", excuse(),  file_url)
+    for r in reader:
+        if display_interval and i % display_interval == 0:
+            printf("%i rows read\n", i)
+        csv_rows.append(r)
+        i += 1
+    return csv_rows
+
+def read_csv_urls(display_interval=None):
+    urls = get_csv_urls()
+    n = len(urls)
+    i = 0
+    all_rows = []
+    for url in urls:
+        printf("reading %i of %i file name %s: ", i, n, url)
+        sys.stdout.flush()
+        rows = read_csv_url(url, display_interval=display_interval)
         all_rows.extend(rows)
         printf(" %i rows read\n", len(rows))
         i += 1
