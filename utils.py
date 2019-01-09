@@ -5,7 +5,6 @@ import traceback
 import tempfile
 import requests
 import datetime
-import cPickle
 import StringIO
 import pycurl
 import time
@@ -16,7 +15,7 @@ import os
 import re
 
 felony_url = "http://home.bexar.org/dc/dcrecords.html"
-misdemeaner_url = "http://gov.bexar.org/cc/records.html"
+misdemeaner_url = "https://www.bexar.org/2923/Misdemeanor-Records"
 
 dtstr_re = re.compile("([0-9]+)/([0-9]+)/([0-9]+)")
 
@@ -87,6 +86,8 @@ def read_csv_files(file_names, display_interval=None):
     i = 0
     all_rows = []
     for file_name in file_names:
+        printf("file %s found\n", file_name)
+    for file_name in file_names:
         printf("reading %i of %i file name %s: ", i, n, file_name)
         sys.stdout.flush()
         rows = read_csv(file_name, display_interval=display_interval)
@@ -128,6 +129,9 @@ def read_csv_urls(display_interval=None):
     n = len(urls)
     i = 0
     all_rows = []
+    for url in urls:
+        printf("url %s found\n", url)
+
     for url in urls:
         printf("reading %i of %i file name %s: ", i, n, url)
         sys.stdout.flush()
