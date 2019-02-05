@@ -106,7 +106,7 @@ def row2dbrow(row, mapper):
 def get_col_mappers(cls):
     col_mapper = {}
     coltypes = get_coltypes(cls)
-    for (k, v) in coltypes.iteritems():
+    for (k, v) in coltypes.items():
         if v == "Date":
             col_mapper[k] = utils.get_date
         if v == "Integer":

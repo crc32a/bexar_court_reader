@@ -5,9 +5,8 @@ import traceback
 import tempfile
 import requests
 import datetime
-import StringIO
+import io
 import pycurl
-import time
 import json
 import sys
 import csv
@@ -34,10 +33,10 @@ def read_url_rows(url):
     fp.write(data)
 
 def clean_ascii(text):
-    return "".join([ch if ord(ch) < 127 else '' for ch in text])
+    return text
 
 def curl_url(url):
-    buffer = StringIO.StringIO()
+    buffer = io.BytesIO()
     c = pycurl.Curl()
     c.setopt(c.URL, url)
     c.setopt(c.WRITEDATA, buffer)
@@ -111,9 +110,11 @@ def read_csv_url(file_url, display_interval=None):
     csv_rows = []
     while True:
         try:
-            text = curl_url(file_url)
-            data = text.replace("\x00","").splitlines()
-            reader = csv.DictReader(data)
+            byteString = curl_url(file_url)
+            uniStr = byteString.decode("utf-8", "ignore")
+            replacedStr = uniStr.replace("\0", "")
+            lines = replacedStr.splitlines()
+            reader = csv.DictReader(lines)
             break
         except:
             printf("%s: retrying %s\n", excuse(),  file_url)
@@ -156,7 +157,7 @@ def write_csv(file_name, rows):
     i = 0
     n = len(rows)
     bad_rows = []
-    for i in xrange(0,n):
+    for i in range(0,n):
         try:
             writer.writerow(rows[i])
         except:
@@ -244,7 +245,7 @@ def pop_rows(rows, n):
     out = []
     if l < n:
         n = l
-    for i in xrange(0, n):
+    for i in range(0, n):
         out.append(rows.pop())
     return out
 
