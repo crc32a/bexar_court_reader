@@ -3,6 +3,7 @@
 import utils
 import dbutils
 import os
+import gc
 
 printf = utils.printf
 
@@ -36,4 +37,5 @@ while i < n:
     s.commit()
     percent = 100.0*(float(i)/float(n))
     printf("%i of %i rows %f %% complete\n", i, n , percent)
+    gc.collect()
 
