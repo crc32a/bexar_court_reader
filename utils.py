@@ -87,7 +87,7 @@ def read_csv_files(file_names, display_interval=None):
     for file_name in file_names:
         printf("file %s found\n", file_name)
     for file_name in file_names:
-        printf("reading %i of %i file name %s:\n, i, n, file_name)
+        printf("reading %i of %i file name %s:\n", i, n, file_name)
         sys.stdout.flush()
         rows = read_csv(file_name, display_interval=display_interval)
         all_rows.extend(rows)
