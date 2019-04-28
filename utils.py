@@ -63,12 +63,17 @@ def read_csv(file_name, display_interval=None):
     fp = open(os.path.expanduser(file_name), "r")
     data = fp.read().replace("\x00", "").splitlines()
     fp.close()
+    lfp = open("log.txt", "a")
+    fprintf(lfp, "reading rows: ")
     reader = csv.DictReader(data)
     for r in reader:
         if display_interval and i % display_interval == 0:
             printf("%i rows read\n", i)
         csv_rows.append(r)
         i += 1
+        fprintf(lfp, "%d, ", i)
+        lfp.flush()
+    lfp.close()
     return csv_rows
 
 
