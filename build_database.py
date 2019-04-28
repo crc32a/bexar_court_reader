@@ -21,10 +21,11 @@ mapper = dbutils.get_col_mappers(dbutils.Court)
 courts = []
 n = len(rows)
 for i in range(0, n):
-    nr = dbutils.row2dbrow(rows[i], mapper)
+    nr = dbutils.row2dbrow(rows.pop(0), mapper)
     if i % 100000 == 0:
         percent = 100.0*float(i)/float(n)
         printf("%i of %i %f %% complete\n", i, n, percent)
+        gc.collect()
     courts.append(nr)
 
 s = dbutils.Session()
