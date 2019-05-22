@@ -80,7 +80,7 @@ class Court(Base):
 
 def get_engine(conf_file="./conf.json"):
     conf = utils.load_json(conf_file)
-    engine = sqlalchemy.create_engine(conf["engine"])
+    engine = sqlalchemy.create_engine(conf["engine"], pool_recycle=60)
     return engine
 
 

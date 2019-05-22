@@ -77,29 +77,6 @@ def read_csv(file_name, display_interval=None):
     return csv_rows
 
 
-def list_csv_files(path):
-    file_names = []
-    for file_name in os.listdir(os.path.expanduser(path)):
-        ext = os.path.splitext(file_name)[1]
-        if ext.lower() == ".csv":
-            file_names.append(os.path.join(path, file_name))
-    return file_names
-
-def read_csv_files(file_names, display_interval=None):
-    n = len(file_names)
-    i = 0
-    all_rows = []
-    for file_name in file_names:
-        printf("file %s found\n", file_name)
-    for file_name in file_names:
-        printf("reading %i of %i file name %s:\n", i, n, file_name)
-        sys.stdout.flush()
-        rows = read_csv(file_name, display_interval=display_interval)
-        all_rows.extend(rows)
-        printf(" %i rows read\n", len(rows))
-        i += 1
-    return all_rows
-
 def get_csv_urls():
     csv_urls = []
     r = requests.get(felony_url)
@@ -112,7 +89,6 @@ def get_csv_urls():
 
 def read_csv_url(file_url, display_interval=None):
     i = 0
-    csv_rows = []
     while True:
         try:
             byteString = curl_url(file_url)
@@ -121,32 +97,14 @@ def read_csv_url(file_url, display_interval=None):
             lines = replacedStr.splitlines()
             reader = csv.DictReader(lines)
             break
+        except KeyboardInterrupt:
+            raise
         except:
             printf("%s: retrying %s\n", excuse(),  file_url)
     for r in reader:
         if display_interval and i % display_interval == 0:
             printf("%i rows read\n", i)
-        csv_rows.append(r)
-        i += 1
-    return csv_rows
-
-def read_csv_urls(display_interval=None):
-    urls = get_csv_urls()
-    n = len(urls)
-    i = 0
-    all_rows = []
-    for url in urls:
-        printf("url %s found\n", url)
-
-    for url in urls:
-        printf("reading %i of %i file name %s: ", i, n, url)
-        sys.stdout.flush()
-        rows = read_csv_url(url, display_interval=display_interval)
-        all_rows.extend(rows)
-        printf(" %i rows read\n", len(rows))
-        i += 1
-    return all_rows
-
+        yield r
 
 def excuse():
     except_message = traceback.format_exc()
@@ -187,6 +145,36 @@ def test_re(val, exp):
         return m.groups()
     return False
 
+
+def read_csv_file_lines(file_name, chunk_size=30000):
+    fp = open(os.path.expanduser(file_name), "r", 64*1024)
+    # The header line must be repeated for every reader object
+    header_line = fp.readline().replace("\x00", "").replace("\n", "")
+    out = []
+    lines = []
+    i = 0
+    while True:
+        line = fp.readline()
+        i += 1
+        lines.append(line.replace("\x00", "").replace("\n", ""))
+        if len(line) <= 0:
+            fp.close()
+            lines.insert(0, header_line)
+            reader = csv.DictReader(lines)
+            for r in reader:
+                out.append(r)
+            fp.close()
+            yield out
+            return
+        if i >= chunk_size:
+            lines.insert(0, header_line)
+            reader = csv.DictReader(lines)
+            for r in reader:
+                out.append(r)
+            yield out
+            i = 0
+            lines = []
+            out = []
 
 def getcollens(rows):
     lens = {}

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
+import time
 import utils
 import dbutils
 import os
 import gc
+
 
 printf = utils.printf
 
@@ -16,27 +18,26 @@ try:
 except:
     printf("%s ccoulden't build table\n", utils.excuse())
 
-rows = utils.read_csv_files(["all.csv"], display_interval=100000)
-mapper = dbutils.get_col_mappers(dbutils.Court)
 courts = []
-n = len(rows)
-for i in range(0, n):
-    nr = dbutils.row2dbrow(rows.pop(0), mapper)
-    if i % 100000 == 0:
-        percent = 100.0*float(i)/float(n)
-        printf("%i of %i %f %% complete\n", i, n, percent)
-        gc.collect()
-    courts.append(nr)
-
-s = dbutils.Session()
 i = 0
-n = len(courts)
-while i < n:
-    rows = utils.pop_rows(courts, 100000)
-    i += len(rows)
-    s.add_all(rows)
+mapper = dbutils.get_col_mappers(dbutils.Court)
+nrows = 0
+total_rows = 0
+time_start = time.time()
+for chunk in utils.read_csv_file_lines("all.csv", chunk_size=10000):
+    db_rows = []
+    for row in chunk:
+        db_rows.append(dbutils.row2dbrow(row, mapper))
+    n = len(db_rows)
+    total_rows += n
+    s = dbutils.Session()
+    s.add_all(db_rows)
     s.commit()
-    percent = 100.0*(float(i)/float(n))
-    printf("%i of %i rows %f %% complete\n", i, n , percent)
+    s.close()
+    time_stop = time.time()
+    printf("Writing %d rows to data base total rows so far is %d ",
+           n, total_rows)
+    printf("in %f seconds\n", time_stop - time_start)
+    time_start = time_stop
     gc.collect()
 
