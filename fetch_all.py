@@ -7,10 +7,16 @@ import csv
 import sys
 import gc
 
+CSVFILE = "./all.csv"
+
 printf = utils.printf
 printf("this pid is %s\n", os.getpid())
-urls = utils.get_csv_urls()
+if os.path.isfile(CSVFILE):
+    printf("Not overwriting %s rename it or delete it and run again\n",
+           CSVFILE)
+    sys.exit()
 i = 0
+urls = utils.get_csv_urls()
 nurls = len(urls)
 fp = open("all.csv", "w", 64*1024)
 writer = None
