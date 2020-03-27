@@ -16,8 +16,10 @@ if os.path.isfile(CSVFILE):
            CSVFILE)
     sys.exit()
 i = 0
+printf("fetching urls\n")
 urls = utils.get_csv_urls()
 nurls = len(urls)
+printf("Fetched %d urls\n", nurls)
 fp = open("all.csv", "w", 64*1024)
 writer = None
 nbadrows = 0
