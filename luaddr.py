@@ -27,9 +27,12 @@ if __name__ == "__main__":
     cols = ["sid,full_name,offense_desc,offense_date,addr_house_nbr,",
             "addr_unit,addr_street,addr_street_suffix,addr_city,addr_state,",
             "addr_zip_code"]
+    rename = {"addr_house_nbr":"nbr", "addr_unit": "unit",
+              "addr_street":"street", "addr_street_suffix":"",
+              "addr_city":"city","addr_state":"stat","addr_zip_code":"zip"}
     s = dbutils.Session()
     cs = s.query(Court).filter(Court.sid==sid).order_by(Court.offense_date).\
          all()
-    d = DbDisplay(rows=cs,cols=colsplit(cols))
+    d = DbDisplay(rows=cs,cols=colsplit(cols),rename=rename)
     dstr = d.display()
     printf("%s\n", dstr)
