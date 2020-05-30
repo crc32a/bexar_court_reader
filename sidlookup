@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+from dbutils import Court
+from dbdisplay import DbDisplay
+import utils
+import dbutils
+import sys
+import os
+import gc
+
+printf = utils.printf
+engine = dbutils.get_engine()
+dbutils.attach_engine(engine)
+printf("pid=%s\n", os.getpid())
+
+def sidlookup(sid):
+    s = dbutils.Session()
+    rows = s.query(Court).filter(Court.sid==sid).all()
+    return rows
+
+def usage(prog):
+    printf("usage is %s <sid number>\n", prog)
+    printf("\n")
+    printf("Fetch sid information for the given sid ID\n")
+
+
+if __name__ == "__main__":
+    args = sys.argv
+    if len(args) <= 1:
+        usage(args[0])
+        sys.exit()
+    sid = int(args[1])
+    rows = sidlookup(sid)
+    cols = "id,sid,full_name,offense_date".split(",")
+    d = DbDisplay(rows=rows,cols=cols)
+    out = d.display()
+    sys.stdout.write(out)

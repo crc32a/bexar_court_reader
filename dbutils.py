@@ -83,6 +83,8 @@ def get_engine(conf_file="./conf.json"):
     engine = sqlalchemy.create_engine(conf["engine"], pool_recycle=60)
     return engine
 
+def get_col_names(cls):
+    return list(cls.__table__.columns.keys())
 
 def get_coltypes(cls):
     out = {}
