@@ -27,7 +27,7 @@ if __name__ == "__main__":
         sys.exit()
     today = datetime.date.today()
     names = args[1:]
-    cols = "sid,full_name,birthdate,age"
+    cols = "sid,full_name,race,birthdate,age"
     s = dbutils.Session()
     q = s.query(Court)
     for name in names:
@@ -39,9 +39,12 @@ if __name__ == "__main__":
     printf("Fetched %d mataches\n", n)
     now = datetime.datetime.now()
     for c in cs:
-        birthdate = c.birthdate
-        age = calculate_age(today,birthdate)
-        setattr(c, "age", age)
+        if c.birthdate is None:
+            setattr(c,"age",None)
+        else:
+            birthdate = c.birthdate
+            age = calculate_age(today,birthdate)
+            setattr(c, "age", age)
     d = DbDisplay(rows=cs, cols=colsplit(cols))
     printf("cols = %s\n", cols)
     out = d.display()

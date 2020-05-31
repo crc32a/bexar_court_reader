@@ -24,13 +24,13 @@ if __name__ == "__main__":
         sys.exit()
     charge = "%%%s%%" % (args[1])
     s = dbutils.Session()
-    cols = ["sid,full_name,sex,birthdate,offense_date,offense_desc,",
+    cols = ["sid,full_name,sex,race,birthdate,offense_date,offense_desc,",
             "offense_type,case_desc,bond_status,bond_amount,case_date,",
             "judgement_date,disposition_desc,judgement_desc,",
             "original_sentence,sentence,attorney,",
             "attorney_appointed_retained,reduced_offense_desc" ]
     rename = {"attorney_appointed_retained":"aar","offense_type":"ot",
-              "bond_status": "bs","bond_amount":"bond"}
+              "bond_status": "bs","bond_amount":"bond", "race":"r"}
     cs = s.query(Court).filter(Court.offense_desc.ilike(charge))\
         .order_by(Court.offense_date).all()
     d = DbDisplay(rows=cs,cols=colsplit(cols),rename=rename)
