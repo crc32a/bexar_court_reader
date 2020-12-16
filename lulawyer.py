@@ -26,9 +26,9 @@ if __name__ == "__main__":
 
     bar_num = int(args[1])
     cols = ["sid,full_name,sex,race,birthdate,offense_date,offense_desc,",
-            "offense_type,case_desc,bond_status,bond_amount,case_date,",
-            "judgement_date,disposition_desc,judgement_desc,",
-            "original_sentence,sentence,attorney,",
+            "offense_type,case_desc,bond_status,bond_amount,g_jury_date,"
+            "g_jury_status,case_date,judgement_date,disposition_desc,",
+            "judgement_desc,original_sentence,sentence,attorney,",
             "attorney_appointed_retained,reduced_offense_desc" ]
     rename = {"attorney_appointed_retained":"aar","offense_type":"ot",
               "bond_status": "bs","bond_amount":"bond","race":"r"}
