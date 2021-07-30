@@ -14,13 +14,13 @@ printf("pid=%s\n", os.getpid())
 
 
 def usage(prog):
-    printf("Usage is %s <lawyer bar number>\nm")
+    printf("Usage is %s <lawyer bar number>\n", prog)
     printf("\n")
     printf("Lookup this lawyers cases\n")
 
 if __name__ == "__main__":
     args = sys.argv
-    if len(args) < 1:
+    if len(args) < 2:
         usage(args[0])
         sys.exit()
 
