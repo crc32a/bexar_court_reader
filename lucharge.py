@@ -25,7 +25,7 @@ if __name__ == "__main__":
     charge = "%%%s%%" % (args[1])
     s = dbutils.Session()
     cols = ["sid,full_name,sex,race,birthdate,offense_date,offense_desc,",
-            "offense_type,case_desc,bond_status,bond_amount,g_jury_date,",
+            "offense_type,case_desc,bond_status,location,bond_amount,g_jury_date,",
             "g_jury_status,case_date,judgement_date,disposition_desc,",
             "judgement_desc,original_sentence,sentence,attorney,",
             "attorney_appointed_retained,reduced_offense_desc" ]
