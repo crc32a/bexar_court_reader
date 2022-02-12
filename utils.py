@@ -91,7 +91,9 @@ def read_csv_url(file_url, display_interval=None):
     i = 0
     while True:
         try:
-            byteString = curl_url(file_url)
+            r = requests.get(file_url,verify=False)
+            printf("Got %d bytes\n", len(r.text))
+            byteString = r.text.encode("utf-8")
             uniStr = byteString.decode("utf-8", "ignore")
             replacedStr = uniStr.replace("\0", "")
             lines = replacedStr.splitlines()
